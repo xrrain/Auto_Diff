@@ -1,5 +1,3 @@
-from collections import defaultdict
-
 import numpy as np
 
 
@@ -8,7 +6,7 @@ class Ops:
         mainly refer to https://sidsite.com/posts/autodiff/ """
 
     def __init__(self, value: float = 0.0, grad: float = 0.0, grad_back: float = 0.0, children: list = None,
-                 op: str = "None"):
+                 op: str = None):
         self.value = value
         self.grad = grad  # store forward grad
         self.op = op
@@ -145,30 +143,63 @@ def JacobianForward(f, return_array=False):
     return g
 
 
+def topological_sort(in_degree, root):
+    T = []
+    visited = set()
+    q = [root]
+    visited.add(root)
+
+    while q:
+        vertex = q.pop(0)
+        T.append(vertex)
+        if vertex.children is not None:
+            for child, _ in vertex.children:
+                if child not in visited:
+                    in_degree[child] -= 1
+                    if in_degree[child] is 0:
+                        q.append(child)
+                        visited.add(child)
+    return T
+
+
+def preprocess(y):
+    # zero_gard and return topological sort sequence
+    node_stack = [y]
+    visited = set()
+    in_degree = dict()
+    in_degree[y] = 0
+    while node_stack:
+        var = node_stack.pop()
+        visited.add(var)
+        if var.children is not None:
+            for child, _ in var.children:
+                degree = in_degree.get(child, 0)
+                in_degree[child] = degree + 1
+                if child not in visited:
+                    if not isinstance(child, Var):
+                        child.grad_back = 0.0
+                        node_stack.append(child)
+    T = topological_sort(in_degree, y)
+    return T
+
+
 def ADbackward(f, return_array=False):
-    def h(x, d, count):
+    def h(x, d):
         if not isinstance(x, list):
             x = [x]
         X = [Var(value=x[i]) for i in range(len(x))]
         Y = f(X)
+        if not isinstance(Y, list):  # return one value
+            Y = [Y]
         assert len(d) == len(Y)
-        # clear grad
         for i, y in enumerate(Y):
-            # bfs update
-            node_stack = list()
             y.grad_back = d[i]
-            node_stack.append(y)
-
-            while node_stack:
-                var = node_stack.pop()
-                count[0] += 1
+            sequence = preprocess(y)
+            for var in sequence:
                 if var.children is not None:
                     for child, local_grad in var.children:
-                        if isinstance(child, Var):
-                            child.grad_back += var.grad_back * local_grad
-                        else:
-                            child.grad_back = var.grad_back * local_grad
-                            node_stack.append(child)
+                        child.grad_back += var.grad_back * local_grad
+
         ans = [x.grad_back for x in X]
         return np.array(ans) if return_array else ans
 

@@ -1,10 +1,7 @@
 import time
 
-from ForwardDiff.base import *
+from BackwardDiff.base import *
 
-
-def p(x):
-    return x[0]*(x[0] + x[1])
 
 def f(x):
     a = 1
