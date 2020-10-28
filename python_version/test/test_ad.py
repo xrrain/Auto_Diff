@@ -1,6 +1,12 @@
+import argparse
 import time
 
 from ADDiff.base import *
+
+parser = argparse.ArgumentParser(description='Auto Diff')
+parser.add_argument('--verbose', action='store_true', default=False, help='print results')
+parser.add_argument('--scale', type=int, default=2020, help='input dimension')
+args = parser.parse_args()
 
 
 def f(x):
@@ -14,19 +20,27 @@ def f(x):
     return [a, b]
 
 
-if __name__ == '__main__':
-    x = [1] * 2020
+
+def run(n=2020, verbose=True):
+    x = [1.0] * n
     g = JacobianForward(f, return_array=True)
     since = time.time()
     res_ad = g(x)
-    print("forward time cost:{:.2f} s".format(time.time() - since))
-    print(res_ad.shape)
+    if verbose:
+        print("forward time cost:{:.2f} s".format(time.time() - since))
+        print(res_ad.shape)
+        print(res_ad)
+    g = JacobianBackward(f, return_array=True)
+    since = time.time()
+    res_bk = g(x)
+    if verbose:
+        print("forward time cost:{:.2f} s".format(time.time() - since))
+        print(res_bk.shape)
+        print(res_bk)
 
-    # h = JacobianBackward(f, return_array=True)
-    # since = time.time()
-    # res_bk = h(x)
-    # print("backward time cost:{:.2f} s".format(time.time() - since))
-    # print(res_bk.shape)
 
-    print(res_ad)
-    # print(res_bk)
+if __name__ == '__main__':
+    # run(args.scale, args.verbose)
+    x = [1.0]*2020
+    gf(x)
+

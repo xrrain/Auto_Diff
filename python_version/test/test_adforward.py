@@ -1,6 +1,13 @@
+import argparse
 import time
 
 from ForwardDiff.base import *
+
+
+parser = argparse.ArgumentParser(description='Auto Diff')
+parser.add_argument('--verbose', action='store_true', default=False, help='print results')
+parser.add_argument('--scale', type=int, default=2020, help='input dimension')
+args = parser.parse_args()
 
 
 def f(x):
@@ -14,11 +21,16 @@ def f(x):
     return [a, b]
 
 
-if __name__ == '__main__':
-    x = [1] * 2020
+def run(n=2020, verbose=True):
+    x = [1.0] * n
     since = time.time()
     g = Jacobian(f, return_array=True)
     res_ad = g(x)
-    print("time cost:{:.2f} s".format(time.time() - since))
-    print(res_ad.shape)
-    print(res_ad)
+    if verbose:
+        print("time cost:{:.2f} s".format(time.time() - since))
+        print(res_ad.shape)
+        print(res_ad)
+
+
+if __name__ == '__main__':
+    run(args.scale, args.verbose)

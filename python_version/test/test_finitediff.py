@@ -1,9 +1,15 @@
+import argparse
 import time
 
 from Numerical_diff.base import five_point_diff
 import numpy as np
 from numpy import sin as sin
 from numpy import cos as cos
+
+parser = argparse.ArgumentParser(description='Auto Diff')
+parser.add_argument('--verbose', action='store_true', default=False, help='print results')
+parser.add_argument('--scale', type=int, default=2020, help='input dimension')
+args = parser.parse_args()
 
 
 def f(x):
@@ -17,13 +23,18 @@ def f(x):
     return [a, b]
 
 
-if __name__ == '__main__':
-    x = [1.0] * 2020
+def run(n=2020, verbose=True):
+    x = [1.0] * n
     since = time.time()
     eps = np.spacing(1.0)  # np.finfo(np.float64).eps
     h = (eps / 4) ** (1 / 5)
     g = five_point_diff(f, h)
     res_ad = g(x)
-    print("time cost:{:.2f} s".format(time.time() - since))
-    print(res_ad.shape)
-    print(res_ad)
+    if verbose:
+        print("time cost:{:.2f} s".format(time.time() - since))
+        print(res_ad.shape)
+        print(res_ad)
+
+
+if __name__ == '__main__':
+    run(args.scale, args.verbose)
