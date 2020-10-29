@@ -1,5 +1,4 @@
 import numpy as np
-from numba import jit
 
 class Ops:
     """Base Class for all operations, support +, -, *, /, sin, cos

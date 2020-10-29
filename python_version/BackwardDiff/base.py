@@ -112,7 +112,7 @@ def topological_sort(in_degree, root):
             for child, _ in vertex.children:
                 if child not in visited:
                     in_degree[child] -= 1
-                    if in_degree[child] is 0:
+                    if in_degree[child] == 0:
                         q.append(child)
                         visited.add(child)
     return T
