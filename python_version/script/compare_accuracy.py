@@ -37,14 +37,18 @@ def gf(x):
 
 def run(n=2020, verbose=True):
     x = [1.0] * n
+    since = time.time()
     res = gf(x)
-    print(res)
+    if verbose:
+        print("forward time cost:{:.6f} s".format(time.time() - since))
+        print(res.shape)
+        print(res)
 
     g = JacobianForward(f, return_array=True)
     since = time.time()
     res_ad = g(x)
     if verbose:
-        print("forward time cost:{:.2f} s".format(time.time() - since))
+        print("forward time cost:{:.6f} s".format(time.time() - since))
         print(res_ad.shape)
         print("l2 norm : {}".format(np.linalg.norm(res - res_ad)))
 
@@ -52,7 +56,7 @@ def run(n=2020, verbose=True):
     since = time.time()
     res_bk = g(x)
     if verbose:
-        print("forward time cost:{:.2f} s".format(time.time() - since))
+        print("forward time cost:{:.6f} s".format(time.time() - since))
         print(res_bk.shape)
         print("l2 norm : {}".format(np.linalg.norm(res - res_bk)))
         print(res_bk)
@@ -63,7 +67,7 @@ def run(n=2020, verbose=True):
     g = five_point_diff(f, h)
     res_fd = g(x)
     if verbose:
-        print("time cost:{:.2f} s".format(time.time() - since))
+        print("time cost:{:.6f} s".format(time.time() - since))
         print(res_fd.shape)
         print("l2 norm : {}".format(np.linalg.norm(res - res_fd)))
         print(res_fd)
