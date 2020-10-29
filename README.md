@@ -34,4 +34,4 @@ $$ acc_i =  ||res_i − res_{df}||_2^2 $$
 |ADbackward| **1.557 × 10−17**|
 |Numerical diff|1.775 × 10−11|
 
-the results can be reproduced by the scripts in folder [script](script).
+the results can be reproduced by the scripts in folder [script](python_version/script).
